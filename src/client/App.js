@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
 import './app.css';
-import ReactImage from './react.png';
+import InputForm from './Components/inputForm';
 
 export default class App extends Component {
-  state = { username: null };
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
-    fetch('/api/getUsername')
+    this.state = {
+      result: { time: {}, name: ''},
+    };
+
+    this.requestPlayTime = this.requestPlayTime.bind(this);
+  }
+
+  requestPlayTime(accountName, region) {
+    fetch(`/api/getHours/${region}/${accountName}`)
       .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
+      .then(time => this.setState({ result: { time }, name: accountName }));
   }
 
   render() {
-    const { username } = this.state;
+    const { time, name } = this.state.result;
     return (
       <div>
-        {username ? <h1>{`Hello ${username}`}</h1> : <h1>Loading.. please wait!</h1>}
-        <img src={ReactImage} alt="react" />
+        <InputForm requestFunction={this.requestPlayTime} />
+        { name !== ''
+          ? <p>{`Of the last 24 hours ${name} spent ${time.hours}:${time.minutes}:${time.seconds} playing`}</p>
+          : <p>/\ Enter summoner name and region above /\</p>}
       </div>
     );
   }
-}
+;}
