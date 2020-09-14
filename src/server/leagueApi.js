@@ -1,44 +1,36 @@
-const LeagueJS = require('leaguejs');
+const { Kayn } = require('kayn');
 const moment = require('moment');
 
 const { RIOT_API_KEY } = require('./config');
 
-const lolApi = new LeagueJS(RIOT_API_KEY, { limits: { allowBurst: true } });
+const kayn = Kayn(RIOT_API_KEY)();
 
 const getBeginTime = () => moment().subtract(24, 'h').valueOf();
 
 const getHoursInLast24 = async (accountName, region) => {
-  const { accountId } = await lolApi.Summoner.gettingByName(accountName, region);
-  const { matches } = await lolApi.Match.gettingListByAccount(
-    accountId,
-    region,
-    { beginTime: getBeginTime() }
-  );
+  const { accountId } = await kayn.Summoner.by.name(accountName).region(region);
+  const { matches } = await kayn.Matchlist.by.accountID(accountId).region(region)
+    .query({ beginTime: getBeginTime() });
 
-  const promiseArray = [];
+  const gameIds = matches.map(match => match.gameId);
+  const requests = gameIds.map(id => kayn.Match.get(id).region(region));
+  return Promise.all(requests)
+    .then((values) => {
+      const durations = values.map(value => value.gameDuration);
+      let total = durations.reduce((a, b) => a + b);
 
-  matches.forEach((match) => {
-    promiseArray.push(
-      lolApi.Match.gettingById(match.gameId, region)
-    );
-  });
+      const result = {};
 
-  return Promise.all(promiseArray).then((values) => {
-    const durationArray = values.map(value => value.gameDuration);
-    let total = durationArray.reduce((a, b) => a + b);
+      result.hours = Math.floor(total / 3600);
+      total -= result.hours * 3600;
 
-    const result = {};
+      result.minutes = Math.floor(total / 60);
+      total -= result.minutes * 60;
 
-    result.hours = Math.floor(total / 3600);
-    total -= result.hours * 3600;
+      result.seconds = total;
 
-    result.minutes = Math.floor(total / 60);
-    total -= result.minutes * 60;
-
-    result.seconds = total;
-
-    return result;
-  });
+      return result;
+    });
 };
 
 module.exports = getHoursInLast24;
