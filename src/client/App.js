@@ -7,7 +7,7 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      result: { time: {}, name: ''},
+      result: { time: {}, name: '' },
     };
 
     this.requestPlayTime = this.requestPlayTime.bind(this);
@@ -20,7 +20,8 @@ export default class App extends Component {
   }
 
   render() {
-    const { time, name } = this.state.result;
+    const { result } = this.state;
+    const { time, name } = result;
     return (
       <div>
         <InputForm requestFunction={this.requestPlayTime} />
