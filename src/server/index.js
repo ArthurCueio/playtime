@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.static('dist'));
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', apiRouter);
 
