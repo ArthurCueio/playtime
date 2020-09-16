@@ -9,7 +9,8 @@
     "dev:webpack": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "lint": "eslint webpack.config.js src/",
     "prod:build": "webpack --mode production",
-    "prod:start": "cross-env NODE_ENV=production node src/server"
+    "prod:start": "cross-env NODE_ENV=production node src/server",
+    "heroku-postbuild": "yarn prod:build"
   },
   "author": "Sandeep Raveesh",
   "license": "ISC",
