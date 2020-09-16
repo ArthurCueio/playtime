@@ -8,12 +8,14 @@ const kayn = Kayn(RIOT_API_KEY)();
 const getBeginTime = () => moment().subtract(24, 'h').valueOf();
 
 const getHoursInLast24 = async (accountName, region) => {
-  const { accountId } = await kayn.Summoner.by.name(accountName).region(region);
-  const { matches } = await kayn.Matchlist.by.accountID(accountId).region(region)
+  const parsedRegion = region.toLowerCase(); // Kayn only understands lowercase region strings
+
+  const { accountId } = await kayn.Summoner.by.name(accountName).region(parsedRegion);
+  const { matches } = await kayn.Matchlist.by.accountID(accountId).region(parsedRegion)
     .query({ beginTime: getBeginTime() });
 
   const gameIds = matches.map(match => match.gameId);
-  const requests = gameIds.map(id => kayn.Match.get(id).region(region));
+  const requests = gameIds.map(id => kayn.Match.get(id).region(parsedRegion));
   return Promise.all(requests)
     .then((values) => {
       const durations = values.map(value => value.gameDuration);

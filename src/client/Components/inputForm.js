@@ -7,21 +7,21 @@ class InputForm extends React.Component {
 
     this.state = {
       accountName: '',
-      region: 'na',
+      region: 'NA',
     };
 
     this.regionList = [
-      'br',
-      'eune',
-      'euw',
-      'kr',
-      'lan',
-      'las',
-      'na',
-      'oce',
-      'ru',
-      'tr',
-      'jp',
+      'BR',
+      'EUNE',
+      'EUW',
+      'KR',
+      'LAN',
+      'LAS',
+      'NA',
+      'OCE',
+      'RU',
+      'TR',
+      'JP',
     ];
 
     this.handleSubmit = this.handleSubmit.bind(this);
