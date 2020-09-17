@@ -3,7 +3,9 @@ const moment = require('moment');
 
 const { RIOT_API_KEY } = require('./config');
 
-const kayn = Kayn(RIOT_API_KEY)();
+const kayn = Kayn(RIOT_API_KEY)({
+  requestOptions: { burst: true }
+});
 
 const getBeginTime = () => moment().subtract(24, 'h').valueOf();
 
