@@ -1,7 +1,7 @@
 {
-  "name": "simple-react-full-stack",
-  "version": "1.0.0",
-  "description": "Boilerplate to build a full stack web application using React, Node.js, Express and Webpack.",
+  "name": "ac-playtime",
+  "version": "0.1.0",
+  "description": "A webapp made to track how much time you spend playing",
   "main": "src/server/index.js",
   "scripts": {
     "start": "yarn dev:start",
@@ -12,8 +12,8 @@
     "prod:start": "cross-env NODE_ENV=production node src/server",
     "heroku-postbuild": "yarn prod:build"
   },
-  "author": "Sandeep Raveesh",
-  "license": "ISC",
+  "author": "Arthur Coelho <arthur.cueio@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "cross-env": "^7.0.2",
