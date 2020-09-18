@@ -32,7 +32,7 @@ export default class App extends Component {
             : { fetching: false, data: {} }
         );
       })
-      .catch((err) => {
+      .catch(() => {
         this.setState({ fetching: false, ok: false, data: {} });
       });
   }
