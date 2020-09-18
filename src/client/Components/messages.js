@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export const SucessMessage = (props) => {
   const { name, time } = props.value;
@@ -6,10 +6,8 @@ export const SucessMessage = (props) => {
   return (
     <p>{`Of the last 24 hours ${name} spent ${time.hours}:${time.minutes}:${time.seconds} playing`}</p>
   );
-}
+};
 
 export const ErrorMessage = () => {
-  return (
-    <p>Error fetching data</p>
-  );
-}
+  return <p>Error fetching data</p>;
+};

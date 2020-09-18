@@ -1,27 +1,27 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 class InputForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      accountName: '',
-      region: 'NA',
+      accountName: "",
+      region: "NA",
     };
 
     this.regionList = [
-      'BR',
-      'EUNE',
-      'EUW',
-      'KR',
-      'LAN',
-      'LAS',
-      'NA',
-      'OCE',
-      'RU',
-      'TR',
-      'JP',
+      "BR",
+      "EUNE",
+      "EUW",
+      "KR",
+      "LAN",
+      "LAS",
+      "NA",
+      "OCE",
+      "RU",
+      "TR",
+      "JP",
     ];
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -39,7 +39,7 @@ class InputForm extends React.Component {
     const { value, name } = event.target;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -48,11 +48,16 @@ class InputForm extends React.Component {
 
     return (
       <form onSubmit={this.handleSubmit}>
-        <input type="text" name="accountName" onChange={this.handleChange} value={accountName} />
+        <input
+          type="text"
+          name="accountName"
+          onChange={this.handleChange}
+          value={accountName}
+        />
         <select name="region" onChange={this.handleChange} value={region}>
-          {
-            this.regionList.map(r => <option value={r}>{r}</option>)
-          }
+          {this.regionList.map((r) => (
+            <option value={r}>{r}</option>
+          ))}
         </select>
         <button type="submit">Go</button>
       </form>

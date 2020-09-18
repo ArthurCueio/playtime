@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import './app.css';
-import InputForm from './Components/inputForm';
-import Loader from './Components/loader';
-import { SucessMessage, ErrorMessage } from './Components/messages';
+import React, { Component } from "react";
+import "./app.css";
+import InputForm from "./Components/inputForm";
+import Loader from "./Components/loader";
+import { SucessMessage, ErrorMessage } from "./Components/messages";
 
 export default class App extends Component {
   constructor(props) {
@@ -11,7 +11,7 @@ export default class App extends Component {
     this.state = {
       fetching: false,
       ok: false,
-      data: null
+      data: null,
     };
 
     this.requestData = this.requestData.bind(this);
@@ -20,16 +20,20 @@ export default class App extends Component {
   requestData(accountName, region) {
     this.setState({ fetching: true, data: null });
     fetch(`/api/getHours/${region}/${accountName}`)
-      .then(res => {
-        this.setState({ok: res.ok});
+      .then((res) => {
+        this.setState({ ok: res.ok });
         return res.json();
       })
-      .then(json => {
+      .then((json) => {
         const { ok } = this.state;
-        this.setState(ok ? { fetching: false, data: {name: accountName, time: json} } : { fetching: false, data: {}});
+        this.setState(
+          ok
+            ? { fetching: false, data: { name: accountName, time: json } }
+            : { fetching: false, data: {} }
+        );
       })
-      .catch(err => {
-        this.setState({ fetching: false, ok: false, data: {}});
+      .catch((err) => {
+        this.setState({ fetching: false, ok: false, data: {} });
       });
   }
 
@@ -39,12 +43,14 @@ export default class App extends Component {
     return (
       <div className="flex-wrapper">
         <main>
-          { fetching ? <Loader /> : <InputForm requestFunction={this.requestData} /> }
-          {data && (
-            ok ? <SucessMessage value={data}/> : <ErrorMessage />
+          {fetching ? (
+            <Loader />
+          ) : (
+            <InputForm requestFunction={this.requestData} />
           )}
+          {data && (ok ? <SucessMessage value={data} /> : <ErrorMessage />)}
         </main>
       </div>
-    )
+    );
   }
 }
