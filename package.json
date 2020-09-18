@@ -10,7 +10,8 @@
     "lint": "eslint webpack.config.js src/",
     "prod:build": "webpack --mode production",
     "prod:start": "cross-env NODE_ENV=production node src/server",
-    "heroku-postbuild": "yarn prod:build"
+    "heroku-postbuild": "yarn prod:build",
+    "format": "prettier --write src/"
   },
   "author": "Arthur Coelho <arthur.cueio@gmail.com>",
   "license": "MIT",
