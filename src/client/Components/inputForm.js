@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { REGIONS } from "../../shared/constants";
 
 class InputForm extends React.Component {
   constructor(props) {
@@ -7,22 +8,8 @@ class InputForm extends React.Component {
 
     this.state = {
       accountName: "",
-      region: "NA",
+      region: REGIONS[0],
     };
-
-    this.regionList = [
-      "BR",
-      "EUNE",
-      "EUW",
-      "KR",
-      "LAN",
-      "LAS",
-      "NA",
-      "OCE",
-      "RU",
-      "TR",
-      "JP",
-    ];
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -55,7 +42,7 @@ class InputForm extends React.Component {
           value={accountName}
         />
         <select name="region" onChange={this.handleChange} value={region}>
-          {this.regionList.map((r) => (
+          {REGIONS.map((r) => (
             <option value={r}>{r}</option>
           ))}
         </select>
