@@ -1,56 +1,50 @@
 import React, { Component } from 'react';
 import './app.css';
 import InputForm from './Components/inputForm';
+import Loader from './Components/loader';
+import { SucessMessage, ErrorMessage } from './Components/messages';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      name: '',
-      result: { time: {} },
       fetching: false,
+      ok: false,
+      data: null
     };
 
-    this.requestPlayTime = this.requestPlayTime.bind(this);
+    this.requestData = this.requestData.bind(this);
   }
 
-  requestPlayTime(accountName, region) {
-    this.setState({ fetching: true });
+  requestData(accountName, region) {
+    this.setState({ fetching: true, data: null });
     fetch(`/api/getHours/${region}/${accountName}`)
-      .then(res => res.json())
-      .then(time => this.setState({ result: { time }, name: accountName, fetching: false }));
+      .then(res => {
+        this.setState({ok: res.ok});
+        return res.json();
+      })
+      .then(json => {
+        const { ok } = this.state;
+        this.setState(ok ? { fetching: false, data: {name: accountName, time: json} } : { fetching: false, data: {}});
+      })
+      .catch(err => {
+        this.setState({ fetching: false, ok: false, data: {}});
+      });
   }
 
   render() {
-    const { result, name, fetching } = this.state;
-    const { time } = result;
-
-    let content;
-    if (fetching) {
-      content = (
-        <div className="loader-wrapper">
-          <div className="loader" />
-          <p>Fetching data...</p>
-        </div>
-      );
-    } else {
-      content = (
-        <div>
-          <InputForm requestFunction={this.requestPlayTime} />
-          {name !== ''
-            ? <p>{`Of the last 24 hours ${name} spent ${time.hours}:${time.minutes}:${time.seconds} playing`}</p>
-            : <p>/\ Enter summoner name and region above /\</p>}
-        </div>
-      );
-    }
+    const { fetching, data, ok } = this.state;
 
     return (
       <div className="flex-wrapper">
         <main>
-          {content}
+          { fetching ? <Loader /> : <InputForm requestFunction={this.requestData} /> }
+          {data && (
+            ok ? <SucessMessage value={data}/> : <ErrorMessage />
+          )}
         </main>
       </div>
-    );
+    )
   }
 }
