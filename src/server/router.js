@@ -4,11 +4,12 @@ const { REGIONS } = require("../shared/constants");
 
 const apiRouter = express.Router();
 
-apiRouter.get("/getHours/:region/:accountName", (req, res) => {
+apiRouter.get("/getPlaytime/:region/:accountName", (req, res) => {
   const { accountName, region } = req.params;
+  const { timeOffset } = req.query;
 
   if (REGIONS.includes(region)) {
-    getHoursInLast24(accountName, region).then((result) => {
+    getHoursInLast24(accountName, region, timeOffset).then((result) => {
       res.json(result);
     });
   } else {

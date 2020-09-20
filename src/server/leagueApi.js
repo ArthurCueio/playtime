@@ -7,10 +7,18 @@ const kayn = Kayn(RIOT_API_KEY)({
   requestOptions: { burst: true },
 });
 
-const getBeginTime = () => moment().subtract(24, "h").valueOf();
+const getBeginTime = (timeOffset) => {
+  const m = moment()
+    // Moment.js expects the real offset, not the reverse offset from Date.prototype.getTimezoneOffset
+    .utcOffset(timeOffset * -1)
+    .startOf("day");
 
-const getHoursInLast24 = async (accountName, region) => {
+  return m.valueOf();
+};
+
+const getPlaytime = async (accountName, region, timeOffset) => {
   const parsedRegion = region.toLowerCase(); // Kayn only understands lowercase region strings
+  const beginTime = getBeginTime(timeOffset);
 
   return kayn.Summoner.by
     .name(accountName)
@@ -19,7 +27,7 @@ const getHoursInLast24 = async (accountName, region) => {
       return kayn.Matchlist.by
         .accountID(accountId)
         .region(parsedRegion)
-        .query({ beginTime: getBeginTime() });
+        .query({ beginTime });
     })
     .then(({ matches }) => {
       const gameIds = matches.map((match) => match.gameId);
@@ -46,4 +54,4 @@ const getHoursInLast24 = async (accountName, region) => {
     .catch(console.error);
 };
 
-module.exports = getHoursInLast24;
+module.exports = getPlaytime;

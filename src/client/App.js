@@ -19,7 +19,8 @@ export default class App extends Component {
 
   requestData(accountName, region) {
     this.setState({ fetching: true, data: null });
-    fetch(`/api/getHours/${region}/${accountName}`)
+    const timeOffset = new Date().getTimezoneOffset();
+    fetch(`/api/getPlaytime/${region}/${accountName}?timeOffset=${timeOffset}`)
       .then((res) => {
         this.setState({ ok: res.ok });
         return res.json();
