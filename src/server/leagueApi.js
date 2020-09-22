@@ -16,42 +16,65 @@ const getBeginTime = (timeOffset) => {
   return m.valueOf();
 };
 
+const getAccountId = (accountName, region) => {
+  return kayn.Summoner.by
+    .name(accountName)
+    .region(region)
+    .then((data) => data.accountId)
+    .catch((err) =>
+      Promise.reject(
+        new Error(`Error fetching summoner info: ${err.error.message}`)
+      )
+    );
+};
+
+const getMatches = (region, beginTime) => {
+  return (accountId) => {
+    return kayn.Matchlist.by
+      .accountID(accountId)
+      .region(region)
+      .query({ beginTime })
+      .then((data) => data.matches)
+      .catch((err) =>
+        Promise.reject(
+          new Error(`Error fetching matchlist: ${err.error.message}`)
+        )
+      );
+  };
+};
+
+const getTimeFromMatchList = (region) => {
+  return (matchList) => {
+    const gameIds = matchList.map((match) => match.gameId);
+    const requests = gameIds.map((id) => kayn.Match.get(id).region(region));
+
+    return Promise.all(requests).then((values) => {
+      const durations = values.map((value) => value.gameDuration);
+      let total = durations.reduce((a, b) => a + b);
+
+      const result = {};
+
+      result.hours = Math.floor(total / 3600);
+      total -= result.hours * 3600;
+
+      result.minutes = Math.floor(total / 60);
+      total -= result.minutes * 60;
+
+      result.seconds = total;
+
+      return result;
+    });
+  };
+};
+
 const getPlaytime = async (accountName, region, timeOffset) => {
   const parsedRegion = region.toLowerCase(); // Kayn only understands lowercase region strings
   const beginTime = getBeginTime(timeOffset);
 
-  return kayn.Summoner.by
-    .name(accountName)
-    .region(parsedRegion)
-    .then(({ accountId }) => {
-      return kayn.Matchlist.by
-        .accountID(accountId)
-        .region(parsedRegion)
-        .query({ beginTime });
-    })
-    .then(({ matches }) => {
-      const gameIds = matches.map((match) => match.gameId);
-      const requests = gameIds.map((id) =>
-        kayn.Match.get(id).region(parsedRegion)
-      );
-      return Promise.all(requests).then((values) => {
-        const durations = values.map((value) => value.gameDuration);
-        let total = durations.reduce((a, b) => a + b);
-
-        const result = {};
-
-        result.hours = Math.floor(total / 3600);
-        total -= result.hours * 3600;
-
-        result.minutes = Math.floor(total / 60);
-        total -= result.minutes * 60;
-
-        result.seconds = total;
-
-        return result;
-      });
-    })
-    .catch(console.error);
+  return getAccountId(accountName, parsedRegion)
+    .then(getMatches(parsedRegion, beginTime))
+    .then(getTimeFromMatchList(parsedRegion))
+    .catch((err) => console.log(err));
 };
 
 module.exports = getPlaytime;
