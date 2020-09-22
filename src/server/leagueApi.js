@@ -17,6 +17,14 @@ class SummonerNotFoundError extends Error {
   }
 }
 
+class MatchesNotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "MatchesNotFoundError";
+    this.stack = Error.captureStackTrace(this, MatchesNotFoundError);
+  }
+}
+
 const getBeginTime = (timeOffset) => {
   const m = moment()
     // Moment.js expects the real offset, not the reverse offset from Date.prototype.getTimezoneOffset
@@ -50,11 +58,18 @@ const getMatches = (region, beginTime) => {
       .region(region)
       .query({ beginTime })
       .then((data) => data.matches)
-      .catch((err) =>
-        Promise.reject(
+      .catch((err) => {
+        if (err.statusCode === 404)
+          return Promise.reject(
+            new MatchesNotFoundError(
+              `No matches found for ${region} ${accountId}`
+            )
+          );
+
+        return Promise.reject(
           new Error(`Error fetching matchlist: ${err.error.message}`)
-        )
-      );
+        );
+      });
   };
 };
 
@@ -94,6 +109,9 @@ const getPlaytime = async (accountName, region, timeOffset) => {
         return {
           error: `Summoner ${accountName} not found on ${region} region`,
         };
+
+      if (err instanceof MatchesNotFoundError)
+        return { time: { hours: 0, minutes: 0, seconds: 0 } };
 
       return err;
     });

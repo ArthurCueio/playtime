@@ -5,9 +5,14 @@ export const SucessMessage = ({ value }) => {
   const { name, time } = value;
   const { hours, minutes, seconds } = time;
 
-  return (
-    <p>{`Of the last 24 hours ${name} spent ${hours}:${minutes}:${seconds} playing`}</p>
-  );
+  let message = "";
+  if (hours === 0 && minutes === 0 && seconds === 0) {
+    message = `${name} hasn't played today.`;
+  } else {
+    message = `Today ${name} spent ${hours}:${minutes}:${seconds} playing.`;
+  }
+
+  return <p>{message}</p>;
 };
 
 SucessMessage.propTypes = {
