@@ -15,6 +15,10 @@ SucessMessage.propTypes = {
   value: PropTypes.object.isRequired,
 };
 
-export const ErrorMessage = () => {
-  return <p>Error fetching data</p>;
+export const ErrorMessage = ({ value }) => {
+  return <p>{`Error: ${value}`}</p>;
+};
+
+ErrorMessage.propTypes = {
+  value: PropTypes.string.isRequired,
 };

@@ -7,6 +7,16 @@ const kayn = Kayn(RIOT_API_KEY)({
   requestOptions: { burst: true },
 });
 
+// Error definitions. kayn doesn't have it's own error types so I have to do this
+
+class SummonerNotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "SummonerNotFoundError";
+    this.stack = Error.captureStackTrace(this, SummonerNotFoundError);
+  }
+}
+
 const getBeginTime = (timeOffset) => {
   const m = moment()
     // Moment.js expects the real offset, not the reverse offset from Date.prototype.getTimezoneOffset
@@ -21,11 +31,16 @@ const getAccountId = (accountName, region) => {
     .name(accountName)
     .region(region)
     .then((data) => data.accountId)
-    .catch((err) =>
-      Promise.reject(
+    .catch((err) => {
+      if (err.statusCode === 404)
+        return Promise.reject(
+          new SummonerNotFoundError(`${region} ${accountName} not found`)
+        );
+
+      return Promise.reject(
         new Error(`Error fetching summoner info: ${err.error.message}`)
-      )
-    );
+      );
+    });
 };
 
 const getMatches = (region, beginTime) => {
@@ -62,7 +77,7 @@ const getTimeFromMatchList = (region) => {
 
       result.seconds = total;
 
-      return result;
+      return { time: result };
     });
   };
 };
@@ -74,7 +89,14 @@ const getPlaytime = async (accountName, region, timeOffset) => {
   return getAccountId(accountName, parsedRegion)
     .then(getMatches(parsedRegion, beginTime))
     .then(getTimeFromMatchList(parsedRegion))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      if (err instanceof SummonerNotFoundError)
+        return {
+          error: `Summoner ${accountName} not found on ${region} region`,
+        };
+
+      return err;
+    });
 };
 
 module.exports = getPlaytime;

@@ -10,7 +10,6 @@ export default class App extends Component {
 
     this.state = {
       fetching: false,
-      ok: false,
       data: null,
     };
 
@@ -21,25 +20,21 @@ export default class App extends Component {
     this.setState({ fetching: true, data: null });
     const timeOffset = new Date().getTimezoneOffset();
     fetch(`/api/getPlaytime/${region}/${accountName}?timeOffset=${timeOffset}`)
-      .then((res) => {
-        this.setState({ ok: res.ok });
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((json) => {
-        const { ok } = this.state;
         this.setState(
-          ok
-            ? { fetching: false, data: { name: accountName, time: json } }
-            : { fetching: false, data: {} }
+          json.error
+            ? { fetching: false, data: { error: json.error } }
+            : { fetching: false, data: { name: accountName, time: json.time } }
         );
       })
       .catch(() => {
-        this.setState({ fetching: false, ok: false, data: {} });
+        this.setState({ fetching: false, data: { error: "Unknown error" } });
       });
   }
 
   render() {
-    const { fetching, data, ok } = this.state;
+    const { fetching, data } = this.state;
 
     return (
       <div className="flex-wrapper">
@@ -49,7 +44,12 @@ export default class App extends Component {
           ) : (
             <InputForm requestFunction={this.requestData} />
           )}
-          {data && (ok ? <SucessMessage value={data} /> : <ErrorMessage />)}
+          {data &&
+            (data.error ? (
+              <ErrorMessage value={data.error} />
+            ) : (
+              <SucessMessage value={data} />
+            ))}
         </main>
       </div>
     );
